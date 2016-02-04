@@ -1,6 +1,24 @@
 type: jupyter notebook to open whatever that is
 I installed what I think is the python IDE, but not sure. 
-also installed PIP
+also installed PIP, and home-brew “use brew help in terminal”
 created an account in github. have yet to post, or run through 'hello world'
 working on a tutorial at www.swcarpentry.github.io/python-novice-inflammation/
+
+trying to uninstall jupyter notebook so i can use anaconda which has a local notebook.
+anaconda and jupiter are IDE’s that use python (I think)
+
+———————————————————————————
+was able to uninstall jupiter notebook successfully
+to start using python, type ipython
+other useful callouts: brew, condo
+turns out brew and condo are both package management systems (they do the same thing)
+python is the “text editor” or IDE
+
+———————————————
+
+turns out python has a text editor… but it sucks.
+I downloaded pycharm.. a real IDE for python. 
+I also imported the matplotlib package, and the bumpy package and am working through the sw carpentry tutorial, putting it in a script titled “sw carpentry tutorial”.
+the tutorial is here http://swcarpentry.github.io/python-novice-inflammation/01-numpy.html
+
 
