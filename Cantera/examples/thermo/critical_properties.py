@@ -3,7 +3,7 @@ Print the critical state properties for the fluids for which Cantera has
 built-in liquid/vapor equations of state.
 """
 
-import cantera as ct 
+import cantera as ct
 
 fluids = {'water': ct.Water(),
           'nitrogen': ct.Nitrogen(),
