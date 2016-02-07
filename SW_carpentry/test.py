@@ -1,12 +1,10 @@
-#! /usr/bin/python
-
 # imports numpy Library
 import numpy
 # import matplotlib pyplot Library and renames it to 'mplt'
 import matplotlib.pyplot as mplt
 
 # imports info from data file and stores it in a matrix labeled 'data'
-data = numpy.loadtxt(fname='/Users/parkerclayton/Documents/Research/SW_carpentry/python-novice-inflammation/data/inflammation-01.csv', delimiter=',')
+data = numpy.loadtxt(fname='/SW_carpentry/python-novice-inflammation/data/inflammation-01.csv', delimiter=',')
 
 # creates a 10 x 3 max matrix of graphs
 fig = mplt.figure(figsize=(10.0, 3.0))
