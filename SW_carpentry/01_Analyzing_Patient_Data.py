@@ -4,7 +4,7 @@ import numpy
 import matplotlib.pyplot as mplt
 
 # imports info from data file and stores it in a matrix labeled 'data'
-data = numpy.loadtxt(fname='python-novice-inflammation/data/inflammation-01.csv', delimiter=',')
+data = numpy.loadtxt(fname='/SW_carpentry/python-novice-inflammation/data/inflammation-01.csv', delimiter=',')
 
 # creates a 10 x 3 max matrix of graphs
 fig = mplt.figure(figsize=(10.0, 3.0))
