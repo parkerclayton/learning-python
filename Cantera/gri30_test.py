@@ -1,1 +1,1 @@
-import cantera as ctgas1 = ct.Solution('gri30.xml')gas1()
+import cantera as ct#creates a solution from the gri30 xml filegas1 = ct.Solution('gri30.xml')#finds all species listed in the gri30 xml filespec = ct.Species.listFromFile('gri30.xml')print(spec)
