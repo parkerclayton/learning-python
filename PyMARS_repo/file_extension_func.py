@@ -18,4 +18,4 @@ def readin(data_file):
 		
 
 
-readin("gri30.xml")
+readin("gri30.inp")

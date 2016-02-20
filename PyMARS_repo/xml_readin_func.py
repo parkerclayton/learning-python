@@ -7,6 +7,7 @@ import os
 
 #function to read in an xml file and print out species names
 def xmlreadin(data_file):
+	print("xmlreadin function running...")
 	spec= ct.Species.listFromFile(data_file)
 	print(spec)
 

@@ -28,7 +28,7 @@ for files in File:
 	if files.endswith(".cti"):
 		print("Success!") 
 	else:
-		print("Nein!")
+		print("wrong!")
 		
 		
 def readin(fname):
