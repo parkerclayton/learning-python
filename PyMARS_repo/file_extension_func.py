@@ -1,4 +1,6 @@
-# this function reads in the data file, and determines what type of file it is
+# this function reads in the data file , and determines what type of file it is
+#it then calls the appropriate function depending on data filetype
+#the data file called must be in the same directory
 
 
 import cantera as ct
@@ -17,5 +19,3 @@ def readin(data_file):
 		print("File type not supported")
 		
 
-
-readin("gri30.inp")
