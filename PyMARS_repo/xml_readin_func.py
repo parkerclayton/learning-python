@@ -4,33 +4,28 @@ import cantera as ct
 import xml.etree.ElementTree as ET
 
 
+
 def xmlreadin(data_file, exclusion_list):
 	print("xmlreadin function running...") 					#prints a status, and then reads in the list of Species from the xml file using cantera
 	
 
 	tree=ET.parse(data_file) 								#this reads in the data from the xml file
 	root=tree.getroot()										#identifies the root of the xml file and prints it
-	print('the root is %s') % root.tag
 	for child in root:										#iterates over all the subElements
 		if child.tag == "speciesData":  					#finds SpeciesData subElement and compiles to list
 			Species_List=[]									#starts a blank list
 			for Species in child:
 				Species_List.append(Species.attrib['name']) #.attrib get the attribute for the Species Element, which in this case is 'name' and then ['name'] calls the string assigned to namein the dictionary. list.append then adds them to a list
-			print(Species_List)
+			print("Original Species List: %s") % Species_List
 	for val in exclusion_list:
 		if val in Species_List:								
 			Species_List.remove(val)						#removes any strings found in the exclusion list from the Species_List
-	print(Species_List)	
+	print("Reduced Species List: %s") %Species_List	
 
 			
 
 
 
-#calling the function
-#list to exclude
-SPexc=['H2', 'H'];
-
-xmlreadin("gri30.xml", SPexc)
 
 
 
@@ -40,6 +35,14 @@ xmlreadin("gri30.xml", SPexc)
 	
 
 #ignore everything below -----------------------------------------------------
+
+
+#calling the function
+#list to exclude
+"""SPexc=['H2', 'H'];
+
+xmlreadin("gri30.xml", SPexc)"""
+
 
 	#compare-list to be used later
 """for val in exclusion_list:
