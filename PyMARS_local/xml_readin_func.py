@@ -2,6 +2,7 @@
 
 import cantera as ct
 import xml.etree.ElementTree as ET
+import os
 
 #used when calling the function locally when testing
 #exclusion_list=['H2']
@@ -20,17 +21,25 @@ def xmlreadin(data_file, exclusion_list):
 				if Species.attrib['name'] in exclusion_list:				#if the name is in the exclusion list, print it, and remove it from the xml file
 					print('Species to Remove: %s') % Species.get('name')
 					speciesData.remove(Species)
-			print("Original Species List: %s") % Species_List
+			#print("Original Species List: %s") % Species_List
+	"""for Species in root.iter('speciesArray'):
+		print(Species.text)
+		for val in exclusion_list:
+			if val in Species.text:
+				Species.remove(val)
+				print(val)"""
+				
+				
 	for val in exclusion_list:												#prints an updated species list
 		if val in Species_List:								
 			Species_List.remove(val)													
-	print("Reduced Species List: %s") %Species_List	
+	#print("Reduced Species List: %s") %Species_List	
 	tree.write('output.xml')												#writes out xml data to a new file titled "output.xml'
-	
+	os.system("open " + 'output.xml')										#opens the new xml file for review
 
 
 #this is used for calling the function locally when testing
-#xmlreadin('copy_gri30.xml', exclusion_list)
+#xmlreadin('gri30.xml', exclusion_list)
 
 
 
