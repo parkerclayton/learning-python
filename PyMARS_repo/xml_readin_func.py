@@ -3,29 +3,34 @@
 import cantera as ct
 import xml.etree.ElementTree as ET
 
-
+#used when calling the function locally when testing
+#exclusion_list=['H2']
 
 def xmlreadin(data_file, exclusion_list):
-	print("xmlreadin function running...") 					#prints a status, and then reads in the list of Species from the xml file using cantera
+	print("xmlreadin function running...") 									#prints a status, and then reads in the list of Species from the xml file using cantera
+
+	tree=ET.parse(data_file) 												#this reads in the data from the xml file
+	root=tree.getroot()														#identifies the root of the xml file and prints it
+	for child in root:														#iterates over all the subElements
+		if child.tag == "speciesData":  									#finds SpeciesData subElement and compiles to list
+			speciesData=child												#defines the SpeciesData subElement
+			Species_List=[]													#starts a blank list								
+			for Species in speciesData:
+				Species_List.append(Species.attrib['name']) 				# get the name attribute for the Species Element and append to a list
+				if Species.attrib['name'] in exclusion_list:				#if the name is in the exclusion list, print it, and remove it from the xml file
+					print('Species to Remove: %s') % Species.get('name')
+					speciesData.remove(Species)
+			print("Original Species List: %s") % Species_List
+	for val in exclusion_list:												#prints an updated species list
+		if val in Species_List:								
+			Species_List.remove(val)													
+	print("Reduced Species List: %s") %Species_List	
+	tree.write('output.xml')												#writes out xml data to a new file titled "output.xml'
 	
 
-	tree=ET.parse(data_file) 								#this reads in the data from the xml file
-	root=tree.getroot()										#identifies the root of the xml file and prints it
-	for child in root:										#iterates over all the subElements
-		if child.tag == "speciesData":  					#finds SpeciesData subElement and compiles to list
-			Species_List=[]									#starts a blank list
-			for Species in child:
-				Species_List.append(Species.attrib['name']) #.attrib get the attribute for the Species Element, which in this case is 'name' and then ['name'] calls the string assigned to namein the dictionary. list.append then adds them to a list
-			print("Original Species List: %s") % Species_List
-	for val in exclusion_list:
-		if val in Species_List:								
-			Species_List.remove(val)						#removes any strings found in the exclusion list from the Species_List
-	print("Reduced Species List: %s") %Species_List	
 
-			
-
-
-
+#this is used for calling the function locally when testing
+#xmlreadin('copy_gri30.xml', exclusion_list)
 
 
 

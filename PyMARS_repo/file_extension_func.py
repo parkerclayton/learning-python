@@ -5,8 +5,9 @@
 
 import cantera as ct
 import os
+import shutil
 
-#demo species exclusion list
+#used when calling the function locally for testing
 exclusion_list=['H2', 'H']
 
 def readin(data_file):
@@ -22,4 +23,5 @@ def readin(data_file):
 		print("File type not supported")
 		
 
-
+#used when calling the function locally for testing
+#readin('gri30.xml')
