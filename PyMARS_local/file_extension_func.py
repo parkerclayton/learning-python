@@ -11,17 +11,15 @@ import shutil
 exclusion_list=['H2', 'H']
 
 def readin(data_file):
-	if data_file.endswith(".xml"):
-		print("This is an Cantera xml file")
-		from xml_readin_func import xmlreadin				#imports and calls xml_readin_func
-		xmlreadin(data_file, exclusion_list)		
+	if data_file.endswith(".xml") or data_file.endswith(".cti"): 
+		print("This is an Cantera xml or cti file")
+		#from xml_readin_func import xmlreadin				
+		#xmlreadin(data_file, exclusion_list)		
 	elif data_file.endswith(".inp"):
 		print("This is a Chemkin inp file")
-	elif data_file.endswith(".cti"):
-		print("This is a Cantera cti file")
 	else:
 		print("File type not supported")
 		
 
 #used when calling the function locally for testing
-#readin('gri30.xml')
+readin('gri30.cti')
