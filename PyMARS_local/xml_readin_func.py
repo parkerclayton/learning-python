@@ -1,50 +1,64 @@
 #function to read in an xml file and print out species names
 
 import cantera as ct
-import xml.etree.ElementTree as ET
-import os
 
 #used when calling the function locally when testing
 #exclusion_list=['H2']
 
 def xmlreadin(data_file, exclusion_list):
-	print("xmlreadin function running...") 									#prints a status, and then reads in the list of Species from the xml file using cantera
-
-	tree=ET.parse(data_file) 												#this reads in the data from the xml file
-	root=tree.getroot()														#identifies the root of the xml file and prints it
-	for child in root:														#iterates over all the subElements
-		if child.tag == "speciesData":  									#finds SpeciesData subElement and compiles to list
-			speciesData=child												#defines the SpeciesData subElement
-			Species_List=[]													#starts a blank list								
-			for Species in speciesData:
-				Species_List.append(Species.attrib['name']) 				# get the name attribute for the Species Element and append to a list
-				if Species.attrib['name'] in exclusion_list:				#if the name is in the exclusion list, print it, and remove it from the xml file
-					print('Species to Remove: %s') % Species.get('name')
-					speciesData.remove(Species)
-			#print("Original Species List: %s") % Species_List
-	"""for Species in root.iter('speciesArray'):
-		print(Species.text)
-		for val in exclusion_list:
-			if val in Species.text:
-				Species.remove(val)
-				print(val)"""
+	Solution = ct.Solution(data_file)
+	Species = Solution.species_names
+	#print(Solution.species_names)
+	for n in exclusion_list:
+		if n in Species:
+			Species.remove(n)
+	Species=[Solution.species(name) for name in Species] #get objects
+	
+	ReactionsEQ = Solution.reaction_equations()
+	print('ReactionsEQ output %s') % ReactionsEQ[0]
+	Reactions = Solution.reactions  
+	print(Reactions())
+	A= Solution.reaction
+	print('.reaction output %s') %A(0)
+	Reactants = Solution.reactants
+	Products  = Solution.products
+	print('reactants %s') % Reactants(0)
+	print('products %s') %Products(0)
+	if 'O2' in Products(0):
+		R=Solution.reaction(0)
+		print(Solution.reaction)
+		
+	#for index, i in enumerate(ReactionsEQ):
+	#need to define Reactants and products for each reaction, and compare to exclusion list
+	#if not in exclusion list, then add reaction to list
+		#for k in exclusion_list:
+			#if k in Reactants(index) or Products(index):
+				#print(Reaction(index))
 				
 				
-	for val in exclusion_list:												#prints an updated species list
-		if val in Species_List:								
-			Species_List.remove(val)													
-	#print("Reduced Species List: %s") %Species_List	
-	tree.write('output.xml')												#writes out xml data to a new file titled "output.xml'
-	os.system("open " + 'output.xml')										#opens the new xml file for review
+		
 
+#reactions returns a list of all solution objects
+#reaction returns the individual object
+#make list of individual objects using 
+#read into new solution
+			
+			
+			
+#calling the function
+#list to exclude
+SPexc=['O2'];
 
-#this is used for calling the function locally when testing
-#xmlreadin('gri30.xml', exclusion_list)
-
-
-
-
-
+xmlreadin("gri30.xml", SPexc)			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 	
 
