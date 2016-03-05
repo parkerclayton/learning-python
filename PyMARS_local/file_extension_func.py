@@ -22,4 +22,4 @@ def readin(data_file):
 		
 
 #used when calling the function locally for testing
-readin('gri30.cti')
+#readin('gri30.cti')
