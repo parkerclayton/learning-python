@@ -7,44 +7,43 @@ import cantera as ct
 
 def xmlreadin(data_file, exclusion_list):
 	Solution = ct.Solution(data_file)
+	
+	
 	Species = Solution.species_names
-	#print(Solution.species_names)
 	for n in exclusion_list:
 		if n in Species:
 			Species.remove(n)
-	Species=[Solution.species(name) for name in Species] #get objects
+	Species	=	[Solution.species(name) for name in Species] #get objects
 	
-	ReactionsEQ = Solution.reaction_equations()
-	print('ReactionsEQ output %s') % ReactionsEQ[0]
-	Reactions = Solution.reactions  
-	print(Reactions())
-	A= Solution.reaction
-	print('.reaction output %s') %A(0)
-	Reactants = Solution.reactants
-	Products  = Solution.products
-	print('reactants %s') % Reactants(0)
-	print('products %s') %Products(0)
-	if 'O2' in Products(0):
-		R=Solution.reaction(0)
-		print(Solution.reaction)
+	
+	ReactionList 	= 	Solution.reaction_equations()
+	ReactionObjects	=	Solution.reaction
+	list	=	[]
+	for i, Rxn in enumerate(ReactionList):
+		Reactants 	= 	ReactionObjects(i).reactants
+		Products	= 	ReactionObjects(i).products
+		for k in exclusion_list:
+			if k not in Reactants and k not in Products:
+				list.append(Solution.reaction(i))
+				
+	ReactionObjects = list
+	
+	
+	
+
 		
-	#for index, i in enumerate(ReactionsEQ):
-	#need to define Reactants and products for each reaction, and compare to exclusion list
-	#if not in exclusion list, then add reaction to list
-		#for k in exclusion_list:
-			#if k in Reactants(index) or Products(index):
-				#print(Reaction(index))
+
 				
 				
 		
 
 #reactions returns a list of all solution objects
 #reaction returns the individual object
-#make list of individual objects using 
+#make list of individual objects using Solution.reaction(index)
 #read into new solution
 			
 			
-			
+	
 #calling the function
 #list to exclude
 SPexc=['O2'];
