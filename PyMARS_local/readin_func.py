@@ -5,7 +5,7 @@ import cantera as ct
 #used when calling the function locally when testing
 #exclusion_list=['H2']
 
-def xmlreadin(data_file, exclusion_list):
+def datareadin(data_file, exclusion_list):
 	Solution = ct.Solution(data_file)
 	
 	
@@ -28,29 +28,15 @@ def xmlreadin(data_file, exclusion_list):
 				
 	ReactionObjects = list
 		
-
-
-	
+	print(ReactionObjects)
 	
 
-		
-
-				
-				
-		
-
-#reactions returns a list of all solution objects
-#reaction returns the individual object
-#make list of individual objects using Solution.reaction(index)
-#read into new solution
-			
-			
 	
 #calling the function
 #list to exclude
-SPexc=['O2'];
+#SPexc=['O2'];
 
-xmlreadin("gri30.xml", SPexc)			
+#datareadin("gri30.xml", SPexc)			
 			
 			
 			
