@@ -27,15 +27,12 @@ def datareadin(data_file, exclusion_list):
 				list.append(Solution.reaction(i))
 				
 	ReactionObjects = list
-		
 	print(ReactionObjects)
-	
 
 	
 #calling the function
 #list to exclude
 #SPexc=['O2'];
-
 #datareadin("gri30.xml", SPexc)			
 			
 			

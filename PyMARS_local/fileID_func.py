@@ -20,3 +20,5 @@ def readin(data_file):
 
 #used when calling the function locally for testing
 #readin('gri30.cti')
+
+ck2cti(gri30.inp)
