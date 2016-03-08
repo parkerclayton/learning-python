@@ -27,7 +27,8 @@ def xmlreadin(data_file, exclusion_list):
 				list.append(Solution.reaction(i))
 				
 	ReactionObjects = list
-	
+
+
 	
 	
 
