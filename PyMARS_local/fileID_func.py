@@ -5,7 +5,7 @@ import cantera as ct
 
 
 #used when calling the function locally for testing
-#exclusion_list=['H2', 'H']
+#exclusion_list=['O2']
 
 def readin(data_file):
 	if data_file.endswith(".xml") or data_file.endswith(".cti"): 
@@ -21,4 +21,3 @@ def readin(data_file):
 #used when calling the function locally for testing
 #readin('gri30.cti')
 
-ck2cti(gri30.inp)

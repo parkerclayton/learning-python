@@ -1,20 +1,15 @@
-#function to read in an xml file and print out species names
+#function to read in an xml/cti file and remove species and reactions
 
 import cantera as ct
 
-#used when calling the function locally when testing
-#exclusion_list=['H2']
-
 def datareadin(data_file, exclusion_list):
 	Solution = ct.Solution(data_file)
-	
-	
 	Species = Solution.species_names
+
 	for n in exclusion_list:
 		if n in Species:
 			Species.remove(n)
-	Species	=	[Solution.species(name) for name in Species] #get objects
-	
+	SpeciesObjects	=	[Solution.species(name) for name in Species] 
 	
 	ReactionList 	= 	Solution.reaction_equations()
 	ReactionObjects	=	Solution.reaction
@@ -27,13 +22,15 @@ def datareadin(data_file, exclusion_list):
 				list.append(Solution.reaction(i))
 				
 	ReactionObjects = list
-	print(ReactionObjects)
-
+	New= ct.Solution(species=SpeciesObjects, reactions=ReactionObjects, thermo='IdealGas', kinetics='GasKinetics')
+	print(Solution())
+	print(New())
+	
 	
 #calling the function
 #list to exclude
-#SPexc=['O2'];
-#datareadin("gri30.xml", SPexc)			
+SPexc=['O2'];
+datareadin("gri30.cti", SPexc)			
 			
 			
 			
