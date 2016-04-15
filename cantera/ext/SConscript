@@ -1,0 +1,118 @@
+from buildutils import *
+
+Import('env', 'build', 'install', 'libraryTargets')
+localenv = env.Clone()
+
+def prep_default(env):
+    localenv = env.Clone()
+
+    # Suppress warnings from external code and auto-generated code
+    if 'g++' in localenv['CXX'] or 'clang' in localenv['CXX']:
+        localenv.Append(CCFLAGS='-w')
+
+    return localenv
+
+
+def prep_fortran(env):
+    localenv = prep_default(env)
+    localenv.Prepend(CPPPATH='#include/cantera/base')  # for config.h
+    return localenv
+
+
+def prep_f2c(env):
+    localenv = prep_default(env)
+
+    localenv.Prepend(CPPPATH=Dir('#ext/f2c_libs'))
+    if not localenv['HAS_TIMES_H']:
+        localenv.Append(CPPDEFINES=['USE_CLOCK'])
+    if not localenv['HAS_UNISTD_H']:
+        localenv.Append(CPPDEFINES=['MSDOS'])
+        if env['VERBOSE']:
+            print "INFO 2:    prep_f2c: adding MSDOS to CPPDEFINES"
+            print "INFO 2:     CPPDEFINES     ", localenv['CPPDEFINES']
+
+    return localenv
+
+
+def prep_gtest(env):
+    localenv = prep_default(env)
+    localenv.Prepend(CPPPATH=[Dir('#ext/googletest'),
+                              Dir('#ext/googletest/include')],
+                    CPPDEFINES={'GTEST_HAS_PTHREAD': 0})
+    return localenv
+
+def prep_cppformat(env):
+    localenv = prep_default(env)
+    build(localenv.Command("#include/cantera/ext/format.h",
+                           "#ext/cppformat/format.h",
+                           Copy('$TARGET', '$SOURCE')))
+    return localenv
+
+# each element of libs is: (subdir, (file extensions), prepfunction)
+libs = [('libexecstream', ['cpp'], prep_default),
+        ('cppformat', ['cc'], prep_cppformat)]
+
+if env['build_with_f2c']:
+    libs.append(('f2c_math', ['cpp','c'], prep_f2c))
+
+    # Create arith.h using the arithchk program
+    if not os.path.exists('arith.h'):
+        arithenv = prep_f2c(env)
+
+        # TODO: make link flag more general
+        arithenv.Append(CPPFLAGS='-DNO_FPINIT')
+        arithenv.Program('f2c_libs/arithchk/arithchk', source='f2c_libs/arithchk/arithchk.c',
+                         LIBS=env['LIBM'])
+        arithenv.Command('#ext/f2c_libs/arith.h', 'f2c_libs/arithchk/arithchk$PROGSUFFIX',
+                         '$SOURCE > $TARGET')
+
+    libs.append(('f2c_libs', 'c', prep_f2c))
+
+    if env['BUILD_BLAS_LAPACK']:
+        libs.append(('f2c_blas', ['c'], prep_f2c))
+        libs.append(('f2c_lapack', ['c'], prep_f2c))
+
+else:
+    libs.append(('math', ['cpp','c','f'], prep_fortran))
+
+    if env['BUILD_BLAS_LAPACK']:
+        libs.append(('blas', ['f'], prep_default))
+        libs.append(('lapack', ['f'], prep_default))
+
+for subdir, extensions, prepFunction in libs:
+    localenv = prepFunction(env)
+    objects = localenv.SharedObject(mglob(localenv, subdir, *extensions))
+    libraryTargets.extend(objects)
+
+if env['system_sundials'] == 'n':
+    localenv = prep_default(env)
+    localenv.Prepend(CPPPATH=Dir('#include/cantera/ext'))
+
+    # Generate sundials_config.h
+    sundials_configh = {}
+    if env['OS'] != 'Windows':
+        sundials_configh['SUNDIALS_USE_GENERIC_MATH'] = 1
+    if not env['BUILD_BLAS_LAPACK']:
+        sundials_configh['SUNDIALS_BLAS_LAPACK'] = 1
+    localenv.AlwaysBuild(env.Command('#include/cantera/ext/sundials/sundials_config.h',
+                                     'sundials_config.h.in',
+                                     ConfigBuilder(sundials_configh)))
+
+    # Copy sundials header files into common include directory
+    for subdir in ('sundials', 'nvector', 'cvodes', 'ida'):
+        for header in mglob(env, 'sundials/include/'+subdir, 'h'):
+            build(localenv.Command('#include/cantera/ext/%s/%s' % (subdir, header.name),
+                                   '#ext/sundials/include/%s/%s' % (subdir, header.name),
+                                   Copy('$TARGET', '$SOURCE')))
+
+    # Compile Sundials source files
+    for subdir in ('sundials', 'nvec_ser', 'cvodes', 'ida'):
+        libraryTargets.extend(localenv.SharedObject(
+            [f for f in mglob(localenv, 'sundials/src/'+subdir, 'c')
+            if '_klu' not in f.name and '_superlumt' not in f.name]))
+
+# Google Test: Used internally for Cantera unit tests.
+if not env['system_googletest']:
+    localenv = prep_gtest(env)
+    gtest = build(localenv.Library('../lib/gtest',
+                                   source=['googletest/src/gtest-all.cc']))
