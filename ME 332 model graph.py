@@ -29,12 +29,12 @@ dP=np.array([6.62, 6.65, 6.59, 6.30, 5.88, 5.36, 4.85, 3.93, 3.08])
 z=np.polyfit(Q, dP, 2)
 y=np.poly1d(z)
 #get curve points
-zp=np.linspace(0, 2, 100)
+zp=np.linspace(0, 3, 100)
 yp=y(zp)
 
 
 "plot visuals"
-plt.axis([0, 2.0, 0, 8])
+plt.axis([0, 3.0, 0, 8])
 plt.title('Centrifugal Pump - Model')
 plt.xlabel('Q (ft^3/s)')
 plt.ylabel('dP (psi)')
@@ -42,7 +42,7 @@ plt.grid(True)
 
 "plot the data"
 plt.plot(Q, dP, 'ko ')
-plt.plot(zp, yp)
+plt.plot(zp, yp, lw=2)
 plt.show()
 
 #given flow rate, want to know dP
