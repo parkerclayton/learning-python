@@ -24,9 +24,15 @@ e=.0005                                                         #feet
 #total length of pipe system
 L=1640.42                                                       #feet
 
+#sharp edge inlet resistance coefficient
+k_sharp= .5
+
+#change in elevation
+dy=32.8084
+
 
 """----------------------------------------------------------------------------
-                            Component Data
+                    Component Resistance Coefficient (K) Data
 ----------------------------------------------------------------------------"""
 
 #gate valve data from p. 382 Table 6.5
@@ -87,9 +93,23 @@ f2= (1/(-1.8*np.log((6.9/Re2) + (((e/d2)/3.7)**1.11))))**2
 
 
 """----------------------------------------------------------------------------
+                        Steady Flow Energy Equation
+----------------------------------------------------------------------------"""
+#head loss
+k_total=k_sharp + 4*k_elbow + k_valve
+
+h_l= ((V**2)/(2*g))*( ((f*L)/d) + k_total)
+
+#energy eq for pump head
+h_p= dy + h_l
+
+
+
+
+"""----------------------------------------------------------------------------
                             PLOTTING
 ----------------------------------------------------------------------------"""
-                    
+
 """
 #plot pipe diameter vs reynolds number
 plt.subplot(311)
