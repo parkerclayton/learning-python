@@ -43,7 +43,7 @@ plt.grid(True)
 "plot the data"
 plt.plot(Q, dP, 'ko ')
 plt.plot(zp, yp)
-#plt.show()
+plt.show()
 
 #given flow rate, want to know dP
 #print(y(.5))
