@@ -59,6 +59,8 @@ eKraw=[.5, .39, .3, .26, .21]
 eD_points=np.linspace(.01, 24, 100)
 eKn=func(eD_points, .4, .45, .21)
 
+
+
 """----------------------------------------------------------------------------
                             State 1 (Q=6 ft^3/s)
 ----------------------------------------------------------------------------"""
@@ -142,10 +144,66 @@ d2_pump= 1             #feet
 
 Q2_pump= Q1_pump*(w2/w1)*((d2_pump/d1_pump)**3)
 dP2= dP1*((w2/w1)**2)*((d2_pump/d1_pump)**2)
+"""-------------------------------------------------------------------------
+                        Optimization
+-------------------------------------------------------------------------"""
+#enumerate, first is index, 2nd is val
+
+#val = np.isclose(h_p1[i], dP2[i], atol=.1)
+
+#state 1----------------------------------------------
+#get dP on head curve line for 6 ft^3/s
+for i, k in enumerate(Q2_pump):
+    val= np.isclose(k, 6, atol=.1)
+    if val == True:
+        dP1_max=dP2[i]
+        ix1=i
+# get hp_p1 (point on vertical line)
+for i, k in enumerate(h_p1):
+    val= np.isclose(k, dP1_max, atol=.4)
+    if val == True:
+        h_p1_max=h_p1[i]
+        i1=i
+#use i1 (index) to get the rest of the values
+
+k1_elbow_max = func(d1i[i1], .4, .45, .21)
+k1_valve_max = func(d1i[i1], .6, 1.4, .05)
+h1_l_max=h1_l[i1]
+f1_max= f1[i1]
+V1_max=V1[i1]
+Re1_max=Re1[i1]
+d1_max=d1i[i1]
+
+#print('State 1 Max: kElbow, kValve, Hl, f, Re, d ')
+#print(k1_elbow_max, k1_valve_max, h1_l_max, f1_max, Re1_max, d1_max)
 
 
 
+#state 2--------------------------------------------
+#get dP on head curve line for 8 ft^3/s
+for i, k in enumerate(Q2_pump):
+    val= np.isclose(k, 8, atol=.1)
+    if val == True:
+        dP2_max=dP2[i]
+        ix2=i
 
+# get hp_p2 (point on vertical line)
+for i, k in enumerate(h_p2):
+    val= np.isclose(k, dP2_max, atol=.2)
+    if val == True:
+        h_p2_max=h_p2[i]
+        i2=i
+#use i2 (index) to get the rest of the values
+
+k2_elbow_max = func(d2i[i2], .4, .45, .21)
+k2_valve_max = func(d2i[i2], .6, 1.4, .05)
+h2_l_max=h2_l[i2]
+f2_max= f2[i2]
+V2_max=V2[i2]
+Re2_max=Re2[i2]
+d2_max=d2i[i2]
+#print('State 2 Max: kElbow, kValve, Hl, f, Re, d ')
+#print(k2_elbow_max, k2_valve_max, h2_l_max, f2_max, Re2_max, d2_max)
 
 """----------------------------------------------------------------------------
                             PLOTTING
@@ -165,8 +223,20 @@ if plot_type == "head_curve":
     plt.plot(Q2_pump, dP2, 'k', lw=2, label='prototype pump')
     "plot pump head on pump head graph"
     plt.plot(state_1_q, h_p1, label ='6 ft^3/s')
-    plt.plot(state_2_q, h_p2, label = '8 ft^3/s')
+    plt.plot(state_2_q, h_p2, label = '8 ft^3/s', color='c')
+    "plot max values"
+    plt.plot(Q2_pump[ix1], h_p1_max, 'rx', mew=2, ms=10)
+    plt.plot(Q2_pump[ix2], h_p2_max, 'rx', mew=2, ms=10)
     plt.legend()
+    print("H1Max=" + str(h_p1_max))
+    print("D1Max = " + str(d1_max))
+    print("V1Max = " + str(V1_max))
+    print("Re1Max = " + str(Re1_max)+'\n\n')
+
+    print("H2Max=" + str(h_p2_max))
+    print("D2Max = " + str(d2_max))
+    print("V2Max = " + str(V2_max))
+    print("Re2Max = " + str(Re2_max))
 
 if plot_type =="DvRe":
     #plot pipe diameter vs reynolds number
@@ -179,7 +249,14 @@ if plot_type =="DvRe":
     plt.xlabel('pipe diameter (in)')
     plt.ylabel('Reynolds number (Re)')
     plt.grid(True)
-    plt.axis([6, 24, 0, 1000000])
+    plt.axis([6, 24, 0, 1500000])
+    "plot max values"
+    plt.plot(d1_max, Re1_max, 'kx')
+    plt.plot(d2_max, Re2_max, 'kx')
+    print("D1Max = " + str(d1_max))
+    print("D2Max = " + str(d2_max))
+    print("Re1Max = " + str(Re1_max))
+    print("Re2Max = " + str(Re2_max))
 
 if plot_type == "DvV":
     #plot pipe diameter vs average velocity of flow
@@ -190,6 +267,12 @@ if plot_type == "DvV":
     plt.ylabel('Average Velocity (ft/s)')
     plt.grid(True)
     plt.axis([6, 24, 0, 45])
+    plt.plot(d1_max, V1_max, 'kx')
+    plt.plot(d2_max, V2_max, 'kx')
+    print("D1Max = " + str(d1_max))
+    print("D2Max = " + str(d2_max))
+    print("V1Max = " + str(V1_max))
+    print("V2Max = " + str(V2_max))
 
 if plot_type =="DvFf":
     #plots friction factor vs pipe diameter
@@ -199,6 +282,12 @@ if plot_type =="DvFf":
     plt.xlabel('pipe diameter (in)')
     plt.ylabel('Friction factor (ft)')
     plt.grid(True)
+    plt.plot(d1_max, f1_max, 'kx')
+    plt.plot(d2_max, f2_max, 'kx')
+    print("D1Max = " + str(d1_max))
+    print("D2Max = " + str(d2_max))
+    print("f1Max = " + str(f1_max))
+    print("f2Max = " + str(f2_max))
     #plt.axis([0, 12, 0, 200])
 
 if plot_type =="gate_valve":
@@ -209,6 +298,12 @@ if plot_type =="gate_valve":
     plt.ylabel('Resistance coefficient (k)')
     plt.grid(True)
     plt.axis([0, 24, 0, 1])
+    plt.plot(d1_max, k1_valve_max, 'gx')
+    plt.plot(d2_max, k2_valve_max, 'kx')
+    print("D1Max = " + str(d1_max))
+    print("D2Max = " + str(d2_max))
+    print("f1Max = " + str(k1_valve_max))
+    print("f2Max = " + str(k2_valve_max))
 
 if plot_type =="elbow_valve":
     plt.plot(eDraw, eKraw, 'rx')
@@ -217,5 +312,11 @@ if plot_type =="elbow_valve":
     plt.ylabel('Resistance coefficient (k)')
     plt.grid(True)
     plt.axis([0, 24, 0, 1])
+    plt.plot(d1_max, k1_elbow_max, 'gx')
+    plt.plot(d2_max, k2_elbow_max, 'kx')
+    print("D1Max = " + str(d1_max))
+    print("D2Max = " + str(d2_max))
+    print("f1Max = " + str(k1_elbow_max))
+    print("f2Max = " + str(k2_elbow_max))
 
 plt.show()
