@@ -10,9 +10,11 @@ import matplotlib.pyplot as plt
 
 pi=np.pi
 #gravity
-g=32.17
+g=32.17                                                     #ft/s^2
 #specific gravity of water
 SG=1
+#pump efficencty
+eta=.75
 #viscosity of water at room temp (68F)
 u=2.09e-5                                                       #slug/ft*s
 #density of water
@@ -34,7 +36,7 @@ L=1640.42                                                       #feet
 k_sharp= .5
 
 #change in elevation
-dy=32.8084
+dy=32.8084                                                  #feet
 
 
 """----------------------------------------------------------------------------
@@ -49,12 +51,12 @@ def func(x, c, a, b):
 gvDraw=[1, 2, 4, 8, 20]                                            # inches
 gvKraw=[.8, .35, .16, .07, .03]                                    #K
 
-gvD_points=np.linspace(.01, 24, 100)
+gvD_points=np.linspace(.01, 24, 100)                  #pipe diameter in inches
 gvKn=func(gvD_points, .6, 1.4, .05)
 
 #90 degree elbow data from p. 382 Table 6.5
-eDraw=[1, 2, 4, 8, 20]
-eKraw=[.5, .39, .3, .26, .21]
+eDraw=[1, 2, 4, 8, 20]                              #pipe diameter in inches
+eKraw=[.5, .39, .3, .26, .21]                       #K values
 
 eD_points=np.linspace(.01, 24, 100)
 eKn=func(eD_points, .4, .45, .21)
@@ -71,7 +73,7 @@ Re1=[]
 d1=np.linspace( .5, 2, 100)                                    #feet
 d1i=d1*12                                                      #in inches
 #average velocity of flow
-V1=(4*Q1)/(pi*(d1**2))
+V1=(4*Q1)/(pi*(d1**2))                                          #ft/s
 #Reynolds number
 Re1=7745.8*((V1*d1i)/v)
 #friction factor (need to modify so either Re or d is only one value)
@@ -83,11 +85,15 @@ k1_valve = func(d1i, .6, 1.4, .05)
 #head loss
 k1_total=k_sharp + 4*k1_elbow + k1_valve
 
-h1_l= ((V1**2)/(2*g))*( ((f1*L)/d1) + k1_total)
+h1_l= ((V1**2)/(2*g))*( ((f1*L)/d1) + k1_total)                    #feet
+h1_l_mod= ((V1**2)/(2*g))*( ((f1*L)/d1) )
 
 #energy eq for pump head
-h_p1= (dy + h1_l)*.433*SG
+h_p1= (dy + h1_l)*.433*SG                                       #PSI
 state_1_q=np.ones(100)*Q1
+
+#pump power required
+Power1=(SG*h1_l*(Q1*448.831)/(3960*eta)) #where 448 converts from ft^3/s to gal/min
 
 
 
@@ -102,7 +108,7 @@ d2=np.linspace(.5, 2, 100)                                     #feet
 d2i=d2*12                                                       #inches
 
 #average velocity of flow
-V2=(4*Q2)/(pi*(d2**2))
+V2=(4*Q2)/(pi*(d2**2))                                         #ft/s
 #Reynolds number
 Re2=7745.8*((V2*d2i)/v)
 #friction factor (need to modify so either Re or d is only one value)
@@ -114,12 +120,17 @@ k2_valve = func(d2i, .6, 1.4, .05)
 #head loss
 k2_total=k_sharp + 4*k2_elbow + k2_valve
 
-h2_l= ((V2**2)/(2*g))*( ((f2*L)/d2) + k2_total)
+h2_l= ((V2**2)/(2*g))*( ((f2*L)/d2) + k2_total)                 #feet
+h2_l_mod= ((V2**2)/(2*g))*( ((f2*L)/d2) )
 
 #energy eq for pump head
-h_p2= (dy + h2_l)*.433*SG
+h_p2= (dy + h2_l)*.433*SG                                       #PSI
 
 state_2_q=np.ones(100)*Q2
+
+#pump power required
+Power2=(SG*h2_l*(Q2*448.831)/(3960*eta)) #where 448 converts from ft^3/s to gal/min
+                                                                #Hp
 
 
 """-------------------------------------------------------------------------
@@ -173,6 +184,7 @@ f1_max= f1[i1]
 V1_max=V1[i1]
 Re1_max=Re1[i1]
 d1_max=d1i[i1]
+Power1_max= Power1[i1]
 
 #print('State 1 Max: kElbow, kValve, Hl, f, Re, d ')
 #print(k1_elbow_max, k1_valve_max, h1_l_max, f1_max, Re1_max, d1_max)
@@ -202,6 +214,8 @@ f2_max= f2[i2]
 V2_max=V2[i2]
 Re2_max=Re2[i2]
 d2_max=d2i[i2]
+Power2_max=Power2[i2]
+
 #print('State 2 Max: kElbow, kValve, Hl, f, Re, d ')
 #print(k2_elbow_max, k2_valve_max, h2_l_max, f2_max, Re2_max, d2_max)
 
@@ -209,7 +223,7 @@ d2_max=d2i[i2]
                             PLOTTING
 ----------------------------------------------------------------------------"""
 
-plot_type="head_curve"
+plot_type="DvRe"
 
 if plot_type == "head_curve":
     "plot model and prototype pump visuals"
@@ -222,21 +236,23 @@ if plot_type == "head_curve":
     plt.plot(Q1_pump, dP1, lw=2, label='model pump')
     plt.plot(Q2_pump, dP2, 'k', lw=2, label='prototype pump')
     "plot pump head on pump head graph"
-    plt.plot(state_1_q, h_p1, label ='6 ft^3/s')
-    plt.plot(state_2_q, h_p2, label = '8 ft^3/s', color='c')
+    plt.plot(state_1_q, h_p1, label ='6 ft^3/s', color='g', lw=2)
+    plt.plot(state_2_q, h_p2, label = '8 ft^3/s', color='c', lw=2)
     "plot max values"
     plt.plot(Q2_pump[ix1], h_p1_max, 'rx', mew=2, ms=10)
     plt.plot(Q2_pump[ix2], h_p2_max, 'rx', mew=2, ms=10)
     plt.legend()
-    print("H1Max=" + str(h_p1_max))
-    print("D1Max = " + str(d1_max))
-    print("V1Max = " + str(V1_max))
+    print("H1Max=" + str(h_p1_max) + ' PSI')
+    print("D1Max = " + str(d1_max) + ' Inches')
+    print("V1Max = " + str(V1_max) + ' ft/s')
     print("Re1Max = " + str(Re1_max)+'\n\n')
+    print("State 1 Power Required= " + str(Power1_max) + " Hp")
 
-    print("H2Max=" + str(h_p2_max))
-    print("D2Max = " + str(d2_max))
-    print("V2Max = " + str(V2_max))
+    print("H2Max=" + str(h_p2_max) + ' PSI')
+    print("D2Max = " + str(d2_max) + ' Inches')
+    print("V2Max = " + str(V2_max) + ' ft/s')
     print("Re2Max = " + str(Re2_max))
+    print("State 2 Power Required= " + str(Power2_max) + " Hp")
 
 if plot_type =="DvRe":
     #plot pipe diameter vs reynolds number
@@ -253,8 +269,8 @@ if plot_type =="DvRe":
     "plot max values"
     plt.plot(d1_max, Re1_max, 'kx')
     plt.plot(d2_max, Re2_max, 'kx')
-    print("D1Max = " + str(d1_max))
-    print("D2Max = " + str(d2_max))
+    print("D1Max = " + str(d1_max) + ' Inches')
+    print("D2Max = " + str(d2_max)+ ' Inches')
     print("Re1Max = " + str(Re1_max))
     print("Re2Max = " + str(Re2_max))
 
@@ -318,5 +334,29 @@ if plot_type =="elbow_valve":
     print("D2Max = " + str(d2_max))
     print("f1Max = " + str(k1_elbow_max))
     print("f2Max = " + str(k2_elbow_max))
+
+if plot_type =="PWRvD":
+    plt.plot(d1i, Power1, 'r', lw=2, label='6 ft^3/s')
+    plt.plot(d2i, Power2, 'k', lw=2,  label='8 ft^3/s')
+    plt.grid(True)
+    plt.legend()
+    plt.plot(d1_max, Power1_max, 'kx', ms=7, mew=2)
+    plt.plot(d2_max, Power2_max, 'kx', ms=7, mew=2)
+    plt.xlabel('pipe diameter (in)')
+    plt.ylabel('Required Pump Horsepower')
+    print("State 1 Power Required= " + str(Power1_max) + " Hp")
+    print("State 2 Power Required= " + str(Power2_max) + " Hp")
+
+if plot_type =="PWRvV":
+    plt.plot(V1, Power1, 'r', lw=2, label='6 ft^3/s')
+    plt.plot(V2, Power2, 'k', lw=2,  label='8 ft^3/s')
+    plt.grid(True)
+    plt.legend()
+    plt.plot(V1_max, Power1_max, 'kx', ms=7, mew=2)
+    plt.plot(V2_max, Power2_max, 'kx', ms=7, mew=2)
+    plt.xlabel('Average velocity (ft/s)')
+    plt.ylabel('Required Pump Horsepower')
+    print("State 1 Power Required= " + str(Power1_max) + " Hp")
+    print("State 2 Power Required= " + str(Power2_max) + " Hp")
 
 plt.show()
