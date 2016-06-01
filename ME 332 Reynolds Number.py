@@ -96,12 +96,12 @@ f2= (1/(-1.8*np.log((6.9/Re2) + (((e/d2)/3.7)**1.11))))**2
                         Steady Flow Energy Equation
 ----------------------------------------------------------------------------"""
 #head loss
-k_total=k_sharp + 4*k_elbow + k_valve
+#k_total=k_sharp + 4*k_elbow + k_valve
 
-h_l= ((V**2)/(2*g))*( ((f*L)/d) + k_total)
+#h_l= ((V**2)/(2*g))*( ((f*L)/d) + k_total)
 
 #energy eq for pump head
-h_p= dy + h_l
+#h_p= dy + h_l
 
 
 
