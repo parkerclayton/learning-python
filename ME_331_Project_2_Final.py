@@ -23,7 +23,7 @@ rho= 62.427961                                                  #lb/ft^3
 #1 cst= 10^-6 m^2/s
 v=1.01                                                          #cst
 #Galvanized Iron absolute roughness (epsilon or curly e)
-e=.0005                                                         #feet
+e=.0005                                                         #feet           #.0005
 #relative roughness is e/diameter
 
 #Reynolds number < 2300 is laminar
@@ -33,10 +33,10 @@ e=.0005                                                         #feet
 L=1640.42                                                       #feet
 
 #sharp edge inlet resistance coefficient
-k_sharp= .5
+k_sharp= 1                                                                     #.5
 
 #change in elevation
-dy=32.8084                                                  #feet
+dy=-32.8084                                                  #feet                  #positive
 
 
 """----------------------------------------------------------------------------
@@ -51,14 +51,14 @@ def func(x, c, a, b):
 gvDraw=[1, 2, 4, 8, 20]                                            # inches
 gvKraw=[.8, .35, .16, .07, .03]                                    #K
 
-gvD_points=np.linspace(.01, 24, 100)                  #pipe diameter in inches
+gvD_points=np.linspace(.01, 24, 1000)                  #pipe diameter in inches
 gvKn=func(gvD_points, .6, 1.4, .05)
 
 #90 degree elbow data from p. 382 Table 6.5
 eDraw=[1, 2, 4, 8, 20]                              #pipe diameter in inches
 eKraw=[.5, .39, .3, .26, .21]                       #K values
 
-eD_points=np.linspace(.01, 24, 100)
+eD_points=np.linspace(.01, 24, 1000)
 eKn=func(eD_points, .4, .45, .21)
 
 
@@ -70,7 +70,7 @@ eKn=func(eD_points, .4, .45, .21)
 Q1= 6                                                           #ft^3/s
 #reynolds number for first flow rate vs pipe diameter
 Re1=[]
-d1=np.linspace( .5, 2, 100)                                    #feet
+d1=np.linspace( .5, 2, 1000)                                    #feet
 d1i=d1*12                                                      #in inches
 #average velocity of flow
 V1=(4*Q1)/(pi*(d1**2))                                          #ft/s
@@ -90,7 +90,7 @@ h1_l_mod= ((V1**2)/(2*g))*( ((f1*L)/d1) )
 
 #energy eq for pump head
 h_p1= (dy + h1_l)*.433*SG                                       #PSI
-state_1_q=np.ones(100)*Q1
+state_1_q=np.ones(1000)*Q1
 
 #pump power required
 Power1=(SG*h1_l*(Q1*448.831)/(3960*eta)) #where 448 converts from ft^3/s to gal/min
@@ -104,7 +104,7 @@ Power1=(SG*h1_l*(Q1*448.831)/(3960*eta)) #where 448 converts from ft^3/s to gal/
 Q2= 8.0                                                           #ft^3/s
 #reynolds number for second flow rate vs pipe diameter
 Re2=[]
-d2=np.linspace(.5, 2, 100)                                     #feet
+d2=np.linspace(.5, 2, 1000)                                     #feet
 d2i=d2*12                                                       #inches
 
 #average velocity of flow
@@ -126,7 +126,7 @@ h2_l_mod= ((V2**2)/(2*g))*( ((f2*L)/d2) )
 #energy eq for pump head
 h_p2= (dy + h2_l)*.433*SG                                       #PSI
 
-state_2_q=np.ones(100)*Q2
+state_2_q=np.ones(1000)*Q2
 
 #pump power required
 Power2=(SG*h2_l*(Q2*448.831)/(3960*eta)) #where 448 converts from ft^3/s to gal/min
@@ -144,7 +144,7 @@ d1_pump= 8.0/12.0             #feet
 z1=np.polyfit(Q1_raw, dP1_raw, 2)
 y1=np.poly1d(z1)
 #get curve points
-Q1_pump=np.linspace(0, 3, 100)
+Q1_pump=np.linspace(0, 3, 1000)
 dP1=y1(Q1_pump)
 
 """-------------------------------------------------------------------------
@@ -165,13 +165,13 @@ dP2= dP1*((w2/w1)**2)*((d2_pump/d1_pump)**2)
 #state 1----------------------------------------------
 #get dP on head curve line for 6 ft^3/s
 for i, k in enumerate(Q2_pump):
-    val= np.isclose(k, 6, atol=.1)
+    val= np.isclose(k, 6, atol=.01)
     if val == True:
         dP1_max=dP2[i]
         ix1=i
 # get hp_p1 (point on vertical line)
 for i, k in enumerate(h_p1):
-    val= np.isclose(k, dP1_max, atol=.4)
+    val= np.isclose(k, dP1_max, atol=.3)                                           #.07
     if val == True:
         h_p1_max=h_p1[i]
         i1=i
@@ -194,14 +194,14 @@ Power1_max= Power1[i1]
 #state 2--------------------------------------------
 #get dP on head curve line for 8 ft^3/s
 for i, k in enumerate(Q2_pump):
-    val= np.isclose(k, 8, atol=.1)
+    val= np.isclose(k, 8, atol=.01)
     if val == True:
         dP2_max=dP2[i]
         ix2=i
 
 # get hp_p2 (point on vertical line)
 for i, k in enumerate(h_p2):
-    val= np.isclose(k, dP2_max, atol=.2)
+    val= np.isclose(k, dP2_max, atol=.09)                                           #.02
     if val == True:
         h_p2_max=h_p2[i]
         i2=i
@@ -223,7 +223,7 @@ Power2_max=Power2[i2]
                             PLOTTING
 ----------------------------------------------------------------------------"""
 
-plot_type="PWRvV"
+plot_type="head_curve"
 
 if plot_type == "head_curve":
     "plot model and prototype pump visuals"
@@ -243,6 +243,7 @@ if plot_type == "head_curve":
     plt.plot(Q2_pump[ix2], h_p2_max, 'rx', mew=2, ms=10)
     plt.legend()
     print("H1Max=" + str(h_p1_max) + ' PSI')
+    print('H1Max(length)= ' + str(h1_l_max) + ' feet')
     print("D1Max = " + str(d1_max) + ' Inches')
     print("V1Max = " + str(V1_max) + ' ft/s')
     print("State 1 Power Required= " + str(Power1_max) + " Hp")
@@ -250,6 +251,7 @@ if plot_type == "head_curve":
 
 
     print("H2Max=" + str(h_p2_max) + ' PSI')
+    print('H2Max(length)= ' + str(h2_l_max) + ' feet')
     print("D2Max = " + str(d2_max) + ' Inches')
     print("V2Max = " + str(V2_max) + ' ft/s')
     print("Re2Max = " + str(Re2_max))
