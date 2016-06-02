@@ -33,10 +33,10 @@ e=.0005                                                         #feet           
 L=1640.42                                                       #feet
 
 #sharp edge inlet resistance coefficient
-k_sharp= 1                                                                     #.5
+k_sharp= .5                                                                     #.5
 
 #change in elevation
-dy=-32.8084                                                  #feet                  #positive
+dy=32.8084                                                  #feet                  #positive
 
 
 """----------------------------------------------------------------------------
